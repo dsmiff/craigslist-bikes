@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import argparse
 from pprint import pprint
@@ -7,10 +8,25 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from forex_python.converter import CurrencyRates
 
 ##_______________________________________________________||
 parser = argparse.ArgumentParser()
 parser.add_argument("-l", "--location", nargs ="*", type=str, help="Location")
+
+##_______________________________________________________||
+def returnConversion(location):
+    c = CurrencyRates()
+    with open('common_currencies.json') as currency_file:
+        currencies = json.load(currency_file)
+    for code, info in currencies.iteritems():
+        if info['capital'] == location:
+            conversion = c.get_rate(code, 'EUR')
+            break
+        else:
+            conversion = 1.
+
+    return conversion
 
 ##_______________________________________________________||
 def meanPrice(data, locations):
@@ -20,7 +36,7 @@ def meanPrice(data, locations):
 
         # Convert prices list to numpy array
         prices_array = np.asarray(prices)
-        sns_plot = sns.distplot(prices_array,kde=False,label=location)
+        sns_plot = sns.distplot(prices_array,kde=False,bins=20,label=location)
         plt.xlabel('bike price (euros)')
         plt.ylabel('mean occurances')
         plt.legend()
@@ -45,19 +61,20 @@ def main():
         title = soup.title.text
         results =  soup.find_all('li',class_='result-row')
         data[location] = {}
+        conversion = returnConversion(location)
         
         for result in results:
-            key = result.a.get_text().encode('ascii', 'ignore').replace('\n','')
-            if not key: continue
-            data[location][key] = {}
-            data[location][key]['link'] = result.a['href']
-            data[location][key]['description'] = result.find('a',class_='result-title hdrlnk').text
+            price = result.a.get_text().encode('ascii', 'ignore').replace('\n','')
+            if not price: continue
+            price = str(int(float(price)*conversion))
+            data[location][price] = {}
+            data[location][price]['link'] = result.a['href']
+            data[location][price]['description'] = result.find('a',class_='result-title hdrlnk').text
 
         df = pd.DataFrame(data[location].items(),columns=['Price','Info'])
         df['Price'] = pd.to_numeric(df['Price']).fillna(value=0)
 
     meanPrice(data, args.location)
-    print data
 
     return data
 

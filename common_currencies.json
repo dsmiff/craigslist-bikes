@@ -1,0 +1,6 @@
+{
+    "USD": {"code":"USD", "capital":"Washington"},
+    "DKK": {"code":"DKK", "capital":"Copenhagen"},
+    "NOK": {"code":"NOK", "capital":"Oslo"),
+    "SEK": {"code":"SEK", "capital":"Stockholm")
+}
