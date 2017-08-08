@@ -3,6 +3,7 @@ import requests
 import argparse
 from pprint import pprint
 from bs4 import BeautifulSoup
+import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -47,6 +48,8 @@ def main():
         data[key]['description'] = result.find('a',class_='result-title hdrlnk').text
         
     meanPrice(data, args.location)
+    df = pd.DataFrame(data.items(),columns=['Price','Info'])
+    df['Price'] = pd.to_numeric(df['Price']).fillna(value=0)
     return data
 
 if __name__=='__main__':
