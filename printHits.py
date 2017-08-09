@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import requests
 import argparse
@@ -21,10 +22,10 @@ def returnConversion(location):
         currencies = json.load(currency_file)
     for code, info in currencies.iteritems():
         if info['capital'] == location:
+            if code == 'EUR': return 1.
             conversion = c.get_rate(code, 'EUR')
             break
-        else:
-            conversion = 1.
+        else: conversion = 1.
 
     return conversion
 
@@ -62,14 +63,17 @@ def main():
         results =  soup.find_all('li',class_='result-row')
         data[location] = {}
         conversion = returnConversion(location)
-        
         for result in results:
+            # Check if Euro already marked in price
+            if u'\u20AC' in result.a.get_text(): conversion = 1.
             price = result.a.get_text().encode('ascii', 'ignore').replace('\n','')
             if not price: continue
             price = str(int(float(price)*conversion))
+            link = result.a['href']
             data[location][price] = {}
             data[location][price]['link'] = result.a['href']
             data[location][price]['description'] = result.find('a',class_='result-title hdrlnk').text
+            data[location][price]['location'] = result.a['href'].split('//')[1].split(('.'))[0] if 'https' in result.a['href'] else location
 
         df = pd.DataFrame(data[location].items(),columns=['Price','Info'])
         df['Price'] = pd.to_numeric(df['Price']).fillna(value=0)

@@ -1,6 +1,9 @@
 {
     "USD": {"code":"USD", "capital":"Washington"},
     "DKK": {"code":"DKK", "capital":"Copenhagen"},
-    "NOK": {"code":"NOK", "capital":"Oslo"),
-    "SEK": {"code":"SEK", "capital":"Stockholm")
+    "NOK": {"code":"NOK", "capital":"Oslo"},
+    "SEK": {"code":"SEK", "capital":"Stockholm"},
+    "GBP": {"code":"GBP", "capital":"London"},
+    "GBP": {"code":"GBP", "capital":"Edinburgh"},
+    "EUR": {"code":"EUR", "capital":"Paris"}
 }
